@@ -185,8 +185,80 @@
     tone(c, out, 'triangle', 380, 200, t, 0.02, 0.08, 0.002);
   };
 
+  // ---- Battle and menu sounds (all synthesized, no files needed) ----
+  registry.talk = function (c, out, t) {
+    tone(c, out, 'square', 520, 480, t, 0.04, 0.08, 0.004);
+  };
+  registry.menuMove = function (c, out, t) {
+    tone(c, out, 'square', 440, 440, t, 0.03, 0.07, 0.003);
+  };
+  registry.menuSelect = function (c, out, t) {
+    tone(c, out, 'square', 660, 660, t, 0.04, 0.09, 0.003);
+    tone(c, out, 'square', 990, 990, t + 0.04, 0.06, 0.09, 0.003);
+  };
+  registry.menuBack = function (c, out, t) {
+    tone(c, out, 'square', 400, 260, t, 0.07, 0.08, 0.003);
+  };
+  registry.battleStart = function (c, out, t) {
+    tone(c, out, 'sawtooth', 120, 900, t, 0.9, 0.2, 0.05);
+    tone(c, out, 'square', 240, 1800, t, 0.9, 0.06, 0.05);
+    noise(c, out, t, 0.9, 0.15, 'highpass', 1500);
+  };
+  registry.splat = function (c, out, t) {
+    noise(c, out, t, 0.18, 0.5, 'lowpass', 900);
+    tone(c, out, 'sine', 200, 70, t, 0.35, 0.45, 0.004);
+    tone(c, out, 'triangle', 520, 140, t + 0.05, 0.4, 0.15, 0.01);
+  };
+  registry.hit = function (c, out, t) {
+    noise(c, out, t, 0.1, 0.45, 'lowpass', 2200);
+    tone(c, out, 'square', 220, 90, t, 0.1, 0.2, 0.003);
+  };
+  registry.hitSuper = function (c, out, t) {
+    noise(c, out, t, 0.18, 0.6, 'lowpass', 3500);
+    tone(c, out, 'square', 320, 70, t, 0.18, 0.28, 0.003);
+    tone(c, out, 'sawtooth', 160, 50, t, 0.22, 0.2, 0.003);
+  };
+  registry.hitWeak = function (c, out, t) {
+    noise(c, out, t, 0.06, 0.2, 'lowpass', 1200);
+    tone(c, out, 'square', 160, 110, t, 0.07, 0.1, 0.003);
+  };
+  registry.miss = function (c, out, t) {
+    noise(c, out, t, 0.15, 0.15, 'bandpass', 1800);
+    tone(c, out, 'sine', 700, 350, t, 0.15, 0.1, 0.01);
+  };
+  registry.faint = function (c, out, t) {
+    tone(c, out, 'triangle', 500, 80, t, 0.6, 0.35, 0.01);
+  };
+  registry.heal = function (c, out, t) {
+    var n = [523, 659, 784, 1047];
+    for (var i = 0; i < n.length; i++) tone(c, out, 'triangle', n[i], n[i], t + i * 0.07, 0.18, 0.22, 0.005);
+  };
+  registry.statUp = function (c, out, t) {
+    tone(c, out, 'square', 400, 800, t, 0.25, 0.1, 0.01);
+  };
+  registry.statDown = function (c, out, t) {
+    tone(c, out, 'square', 700, 300, t, 0.25, 0.1, 0.01);
+  };
+  registry.levelUp = function (c, out, t) {
+    var n = [523, 659, 784, 1047];
+    for (var i = 0; i < n.length; i++) tone(c, out, 'square', n[i], n[i], t + i * 0.1, i === 3 ? 0.4 : 0.12, 0.12, 0.005);
+  };
+  registry.win = function (c, out, t) {
+    var n = [392, 523, 659, 784, 659, 784];
+    for (var i = 0; i < n.length; i++) tone(c, out, 'square', n[i], n[i], t + i * 0.11, i === 5 ? 0.5 : 0.14, 0.11, 0.005);
+  };
+  registry.lose = function (c, out, t) {
+    var n = [392, 330, 262];
+    for (var i = 0; i < n.length; i++) tone(c, out, 'triangle', n[i], n[i] * 0.97, t + i * 0.22, i === 2 ? 0.6 : 0.24, 0.3, 0.01);
+  };
+  registry.coin = function (c, out, t) {
+    tone(c, out, 'square', 988, 988, t, 0.07, 0.1, 0.003);
+    tone(c, out, 'square', 1319, 1319, t + 0.07, 0.25, 0.1, 0.003);
+  };
+
   // ---- Sound files (played with plain audio elements; works from file://) ----
   var files = {};
+  var clip = null;       // the one tracked short clip: { el, timer, fade, name }
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
 
@@ -200,7 +272,52 @@
     } catch (e) {}
   }
 
+  function stopClip() {
+    var c = clip;
+    clip = null;
+    if (!c) return;
+    try { clearTimeout(c.timer); clearInterval(c.fade); } catch (e) {}
+    try { c.el.pause(); } catch (e) {}
+  }
+
+  function playClip(name, seconds, fadeSeconds) {
+    try {
+      stopClip();
+      if (muted) return;
+      var f = files[name];
+      if (!f || f.state === 'failed') { synth(name); return; }
+      seconds = Number(seconds) > 0 ? Number(seconds) : 5;
+      fadeSeconds = Math.max(0, Math.min(seconds, Number(fadeSeconds) || 0));
+      var el = f.el.cloneNode();
+      var vol = clamp01(volume * f.gain);
+      el.volume = vol;
+      try { el.currentTime = 0; } catch (e) {}
+      var mine = { el: el, timer: null, fade: null, name: name };
+      clip = mine;
+      var started = Date.now();
+      mine.timer = setTimeout(function () { if (clip === mine) stopClip(); }, seconds * 1000);
+      if (fadeSeconds > 0) {
+        mine.fade = setInterval(function () {
+          if (clip !== mine) return;
+          var left = seconds - (Date.now() - started) / 1000;
+          if (left < fadeSeconds) {
+            try { el.volume = clamp01(vol * Math.max(0, left / fadeSeconds)); } catch (e) {}
+          }
+        }, 40);
+      }
+      var p = el.play();
+      if (p && p.catch) {
+        p.catch(function () {
+          if (clip === mine) { stopClip(); synth(name); }
+        });
+      }
+    } catch (e) { try { stopClip(); synth(name); } catch (e2) {} }
+  }
+
   G.Audio = {
+    playClip: playClip,
+    stopClip: stopClip,
+    isClipPlaying: function () { return !!clip; },
     play: function (name) {
       try {
         if (muted) return;
@@ -242,9 +359,31 @@
     },
     setMuted: function (m) {
       muted = !!m;
+      if (muted) stopClip();
       applyVolume();
     }
   };
 
+  // ---- SOUND_FILES: which sound slot uses which file. Slots without a file use the built-in synth sound. ----
   G.Audio.registerFile('pickup', 'Audio/floraphonic-bloop-2-186531.mp3');
+  // First 5 seconds of this song play when a battle starts (file is not on GitHub; synth whoosh if missing).
+  G.Audio.registerFile('battleStart', 'Audio/Pokémon FireRed & LeafGreen - Rival Encounter Music (HQ).mp3', { gain: 1.2 });
+  // Ready for your own files (uncomment and point at a file):
+  // G.Audio.registerFile('talk', 'Audio/talk.mp3');
+  // G.Audio.registerFile('menuMove', 'Audio/menu-move.mp3');
+  // G.Audio.registerFile('menuSelect', 'Audio/menu-select.mp3');
+  // G.Audio.registerFile('menuBack', 'Audio/menu-back.mp3');
+  // G.Audio.registerFile('splat', 'Audio/splat.mp3');
+  // G.Audio.registerFile('hit', 'Audio/hit.mp3');
+  // G.Audio.registerFile('hitSuper', 'Audio/hit-super.mp3');
+  // G.Audio.registerFile('hitWeak', 'Audio/hit-weak.mp3');
+  // G.Audio.registerFile('miss', 'Audio/miss.mp3');
+  // G.Audio.registerFile('faint', 'Audio/faint.mp3');
+  // G.Audio.registerFile('heal', 'Audio/heal.mp3');
+  // G.Audio.registerFile('statUp', 'Audio/stat-up.mp3');
+  // G.Audio.registerFile('statDown', 'Audio/stat-down.mp3');
+  // G.Audio.registerFile('levelUp', 'Audio/level-up.mp3');
+  // G.Audio.registerFile('win', 'Audio/win.mp3');
+  // G.Audio.registerFile('lose', 'Audio/lose.mp3');
+  // G.Audio.registerFile('coin', 'Audio/coin.mp3');
 })();

@@ -69,6 +69,16 @@ window.Game = window.Game || {};
   S.smoke3 = { img: 'smoke3', w: 32, h: 16, frames: 7, footX: 16, footY: 15 };
   S.smokeFrame = function (i) { return { img: 'smoke3', x: i * 32, y: 0, w: 32, h: 16 }; };
 
+  // Farmer Rex (Pixel_Art_Character_Base_free): cells are 32x48; the sheet starts at y=32
+  // (the words above each group of poses are above that line). Feet at (16,47) in a cell.
+  S.rival = {
+    cw: 32, ch: 48, top: 32, footX: 16, footY: 47,
+    groupX: { attack: 32, run: 176, wave: 320 },
+    row: { down: 0, side: 1, up: 2 },
+    sideFacesRight: false,   // checked by eye: the side poses look to the LEFT
+    standGroup: 'attack', standFrame: 3
+  };
+
   // Draw a rectangle from the atlas at world position (dx,dy) minus camera.
   S.draw = function (ctx, r, dx, dy, cam) {
     var img = Game.Assets.get(r.img);

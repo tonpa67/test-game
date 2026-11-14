@@ -6,7 +6,7 @@ window.Game = window.Game || {};
     KeyA: 'left', ArrowLeft: 'left',
     KeyD: 'right', ArrowRight: 'right',
     ShiftLeft: 'slow', ShiftRight: 'slow',
-    KeyE: 'interact', Space: 'interact',
+    KeyE: 'interact', Space: 'interact', Enter: 'interact', NumpadEnter: 'interact',
     KeyI: 'inventory', Escape: 'close',
     F3: 'debug'
   };

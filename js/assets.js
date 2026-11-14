@@ -18,7 +18,10 @@ window.Game = window.Game || {};
     chickenRed:    ROOT + 'Farm Animals/Chicken Red.png',
     chickenBlonde: ROOT + 'Farm Animals/Chicken Blonde  Green.png',
     chick:    ROOT + 'Farm Animals/Baby Chicken Yellow.png',
-    smoke3:   'Assets/Smoke Effect 01/Smoke VFX3.png'
+    smoke3:   'Assets/Smoke Effect 01/Smoke VFX3.png',
+    rivalBase:   'Assets/Pixel_Art_Character_Base_free/Base_Human_03_free.png',
+    rivalHair:   'Assets/Pixel_Art_Character_Base_free/Hair_01-01_free.png',
+    rivalOutfit: 'Assets/Pixel_Art_Character_Base_free/Outfit_Explorer_01_free.png'
   };
   var images = {};
 

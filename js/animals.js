@@ -140,6 +140,29 @@ window.Game = window.Game || {};
     a.drawable.sortY = a.y;
   }
 
+  // "Daisy the cow. Field type. ... Take Daisy as your partner?"
+  function askPartner(speciesId, kind) {
+    var C = Game.Creatures, D = Game.Dialog, T = Game.Team;
+    if (!C || !D || !D.open || !T || T.hasStarter()) return;
+    var sp = C.SPECIES[speciesId];
+    var typeName = (C.TYPES && C.TYPES[sp.type] && C.TYPES[sp.type].name) || sp.type;
+    D.open({
+      speaker: sp.name,
+      lines: [
+        sp.name + ' the ' + kind + '. ' + typeName + ' type.',
+        sp.blurb || '',
+        'Take ' + sp.name + ' as your partner?'
+      ],
+      choices: ['Yes', 'No'],
+      onDone: function (choice) {
+        if (choice !== 0 || T.hasStarter()) return;
+        T.add(C.create(speciesId, 5));
+        if (Game.Audio && Game.Audio.play) Game.Audio.play('levelUp');
+        if (Game.HUD && Game.HUD.showMessage) Game.HUD.showMessage(sp.name + ' is now your partner!', 3);
+      }
+    });
+  }
+
   var A = Game.Animals = {
     init: function (pen) {
       area = { x: pen.x + 4, y: pen.y + 4, w: pen.w - 8, h: pen.h - 8 };
@@ -176,6 +199,21 @@ window.Game = window.Game || {};
     },
     getRects: function () {
       return list.map(hitbox);
+    },
+    // The animal closest to (x,y) within `reach` pixels of its feet, as something the player can use.
+    // Choosing it asks if it should become the player's partner.
+    getNearest: function (x, y, reach) {
+      var best = null, bestD = reach * reach + 1;
+      for (var i = 0; i < list.length; i++) {
+        var dx = list[i].x - x, dy = list[i].y - y;
+        var d = dx * dx + dy * dy;
+        if (d <= reach * reach && d < bestD) { best = list[i]; bestD = d; }
+      }
+      if (!best) return null;
+      var C = Game.Creatures;
+      var id = C && C.speciesForAnimalImg ? C.speciesForAnimalImg(best.img) : null;
+      if (!id || !C.SPECIES || !C.SPECIES[id]) return null;
+      return { interact: function () { askPartner(id, best.type === 'chick' ? 'chick' : best.type); } };
     }
   };
 })();

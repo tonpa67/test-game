@@ -16,7 +16,7 @@ No installing, no internet and no extra programs needed. Just keep the `Assets` 
 | --- | --- |
 | W A S D or the arrow keys | Move around (you run by default) |
 | Hold Shift | Walk slowly instead of running |
-| E or Space | Open the chest (press again to close it), pick up an egg |
+| E, Space or Enter | Open the chest (press again to close it), pick up an egg, talk to Farmer Rex, choose a partner animal |
 | I | Open or close your backpack (the game pauses while it is open) |
 | Esc | Close the backpack or chest |
 | 1-5 or mouse wheel | Choose a hotbar slot (the row of five slots at the bottom) |
@@ -40,3 +40,16 @@ Tip: stand right next to the chest, face it, then press E.
 - The chest holds 20 things, and they stay until you reload the page. On most screens the chest and backpack show side by side.
 - The egg pickup sound comes from the file in the `Audio` folder (floraphonic-bloop-2-186531.mp3). Keep that folder next to `index.html`.
 - Your backpack, chest and eggs are not saved: they reset when you reload the page.
+
+## Choosing a partner and battling Farmer Rex
+
+- In the animal pen, walk up to a cow, a chicken or the chick, face it and press **E**. It tells you its name, its type and a short description, then asks "Take it as your partner?" Choose **Yes** or **No**. You can only choose one partner for now, and your partner stays in the pen.
+- **Farmer Rex** stands just north-east of the pen gate. He waves when you come close. Press **E** next to him to talk. Before you have a partner he only gives you a hint. Once you have one, he challenges you to a friendly battle.
+- Battles are turn by turn. Your animal and Rex's animal take turns using moves. Rex's animal is a different kind from yours and has the same level as yours.
+- Battle controls: **W A S D** or the arrow keys move the cursor, **E**, **Space** or **Enter** choose, **Esc** goes back, and the mouse works too (move over an option and click). Press **E** or click to move through the battle text.
+- The menu has **Fight** (pick a move), **Items** (use an egg from your backpack or hotbar to heal 20 HP), **Switch** (you only have one animal for now) and **Run** (you can't run from Rex).
+- Some types are strong against others: Field beats Water, Water beats Fire, Fire beats Field.
+- If you win, your animal gets experience points and you get coins. The coin counter sits next to the hotbar. Your animal is fully healed after every battle.
+- If you lose, you wake up back at your house with a few coins less, and your animal is healed. There is no game over. You can battle Rex again as often as you like.
+- Sound: a short 5-second sound plays when the battle starts, taken from the music file in the `Audio` folder (Pokemon FireRed & LeafGreen - Rival Encounter Music). That file is not uploaded to GitHub. If it is missing, the game plays a short whoosh sound instead. The other battle sounds are made by the game itself for now, and there is no battle music.
+- Nothing is saved: your partner, level and coins reset when you reload the page.

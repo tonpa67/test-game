@@ -11,11 +11,13 @@ window.Game = window.Game || {};
 
   // ---- Items ----
   var items = {
-    egg: { id: 'egg', name: 'Egg', icon: { img: 'chick', x: 0, y: 32, w: 16, h: 16 }, maxStack: 99 }
+    egg: { id: 'egg', name: 'Egg', icon: { img: 'chick', x: 0, y: 32, w: 16, h: 16 }, maxStack: 99,
+      desc: 'Heals 20 HP in battle.', battle: { heal: 20 } }
   };
   Game.Items = {
     egg: items.egg,
-    get: function (id) { return items[id] || null; }
+    get: function (id) { return items[id] || null; },
+    list: function () { return Object.keys(items).map(function (k) { return items[k]; }); }
   };
 
   // ---- State ----
@@ -91,6 +93,26 @@ window.Game = window.Game || {};
     var t = 0;
     for (var k = 0; k < TOTAL; k++) if (slots[k] && slots[k].id === id) t += slots[k].count;
     return t;
+  }
+
+  // Take items out of the backpack (slots 5-24 first, then the hotbar). Chest is not used.
+  // Returns how many were really removed.
+  function removeItems(id, count) {
+    count = Math.floor(count);
+    if (!(count > 0)) return 0;
+    var left = count, k, s, take;
+    var order = [];
+    for (k = HOTBAR; k < TOTAL; k++) order.push(k);
+    for (k = 0; k < HOTBAR; k++) order.push(k);
+    for (var n = 0; n < order.length && left > 0; n++) {
+      s = slots[order[n]];
+      if (s && s.id === id) {
+        take = Math.min(s.count, left);
+        s.count -= take; left -= take;
+        if (s.count <= 0) slots[order[n]] = null;
+      }
+    }
+    return count - left;
   }
 
   function select(i) {
@@ -461,6 +483,7 @@ window.Game = window.Game || {};
     add: add,
     canAdd: canAdd,
     count: countOf,
+    remove: removeItems,
     getSlot: function (i) {
       var s = slots[i];
       return s ? { id: s.id, count: s.count } : null;

@@ -54,7 +54,7 @@ window.Game = window.Game || {};
     '....s................t...T.............F',
     '.T......C.......s......T...............F',
     '.t.......o................t............F',
-    '.T......o...................s..........F',
+    '.T......o...............R...s..........F',
     '.........o.......................T.....F',
     '.T..FFFFo.FFFF..FFFFF..FFFFF...T...t...F',
     '....F....o...F..F...s......F...........F',
@@ -183,6 +183,13 @@ window.Game = window.Game || {};
             var rect = S.crop(hash(c, r) >> 3, (c * 7 + r * 3) % 6);
             addDrawable(y + TILE, function (ctx, cam) { spr(ctx, rect, x, y, cam); });
           })(c, r, x, y);
+        } else if (ch === 'R') {
+          // Farmer Rex stands with his feet at the bottom middle of this tile
+          if (Game.Rival && Game.Rival.init) {
+            Game.Rival.init(x + 8, y + TILE);
+            var rs = Game.Rival.getSolid && Game.Rival.getSolid();
+            if (rs) addSolid(rs.x, rs.y, rs.w, rs.h);
+          }
         } else if (ch === 'P') {
           W.spawn = { x: x + 8, y: y + 8 };
         }
@@ -245,6 +252,10 @@ window.Game = window.Game || {};
     var out = W.drawables;
     if (Game.Animals) out = out.concat(Game.Animals.getDrawables());
     if (Game.Eggs) out = out.concat(Game.Eggs.getDrawables());
+    if (Game.Rival && Game.Rival.getDrawable) {
+      var rd = Game.Rival.getDrawable();
+      if (rd) out.push(rd);
+    }
     if (Game.Effects) out = out.concat(Game.Effects.getDrawables());
     return out;
   };
@@ -276,7 +287,18 @@ window.Game = window.Game || {};
       var r = ch.rect;
       if (px >= r.x - 2 && px <= r.x + r.w + 2 && py >= r.y - 2 && py <= r.y + r.h + 2) return ch;
     }
-    if (Game.Eggs && Game.Eggs.getNearest) return Game.Eggs.getNearest(x, y - 3, 16);
+    if (Game.Rival && Game.Rival.getInteractable) {
+      var rv = Game.Rival.getInteractable(x, y, facing);
+      if (rv) return rv;
+    }
+    if (Game.Eggs && Game.Eggs.getNearest) {
+      var egg = Game.Eggs.getNearest(x, y - 3, 16);
+      if (egg) return egg;
+    }
+    // Animals can only be chosen as a partner until you have one.
+    var T = Game.Team;
+    var haveStarter = !!(T && T.hasStarter && T.hasStarter());
+    if (!haveStarter && Game.Animals && Game.Animals.getNearest) return Game.Animals.getNearest(x, y - 3, 18);
     return null;
   };
 

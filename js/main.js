@@ -32,6 +32,7 @@ window.Game = window.Game || {};
   StubPlayer.prototype.hitbox = function () { return { x: this.x - 5, y: this.y - 3, w: 10, h: 6 }; };
 
   var World, player, cam = Game.Camera, last = 0, scale = 1;
+  Game.getPlayer = function () { return player; };
 
   function resize() {
     var iw = window.innerWidth, ih = window.innerHeight;
@@ -53,13 +54,23 @@ window.Game = window.Game || {};
 
     if (Input.wasPressed('debug')) C.DEBUG = !C.DEBUG;
 
-    var Inv = Game.Inventory;
-    var wasOpen = !!(Inv && Inv.isOpen());
-    if (Inv) Inv.handleInput(Input, cam.w, cam.h);
-    var paused = wasOpen || !!(Inv && Inv.isOpen());
-    if (!paused) {
-      player.update(dt, Input, World);
-      World.update(dt, player);
+    var Inv = Game.Inventory, B = Game.Battle, D = Game.Dialog;
+    var inBattle = !!(B && B.isActive && B.isActive());
+    if (inBattle) {
+      B.update(dt, Input, cam.w, cam.h);
+    } else {
+      // A talking box blocks everything else; the key that closes it must not also act in the world.
+      var dialogWas = !!(D && D.isOpen && D.isOpen());
+      if (dialogWas) D.handleInput(Input, cam.w, cam.h);
+      var blocked = dialogWas || !!(D && D.isOpen && D.isOpen()) || !!(B && B.isActive && B.isActive());
+      var invWas = !!(Inv && Inv.isOpen());
+      if (!blocked && Inv) Inv.handleInput(Input, cam.w, cam.h);
+      var paused = blocked || invWas || !!(Inv && Inv.isOpen());
+      if (!paused) {
+        player.update(dt, Input, World);
+        World.update(dt, player);
+        if (Game.Rival && Game.Rival.update) Game.Rival.update(dt, player);
+      }
     }
     cam.follow(player.x, player.y - 8, World.widthPx, World.heightPx);
 
@@ -87,8 +98,13 @@ window.Game = window.Game || {};
       ctx.strokeRect(Math.round(h.x - cam.x) + 0.5, Math.round(h.y - cam.y) + 0.5, h.w - 1, h.h - 1);
     }
 
-    if (Game.HUD) Game.HUD.draw(ctx, cam.w, cam.h, dt);
-    if (Inv) Inv.draw(ctx, cam.w, cam.h);
+    var covering = !!(B && B.isActive && B.isActive() && B.coversWorld && B.coversWorld());
+    if (!covering) {
+      if (Game.HUD) Game.HUD.draw(ctx, cam.w, cam.h, dt);
+      if (D && D.draw) D.draw(ctx, cam.w, cam.h);
+      if (Inv) Inv.draw(ctx, cam.w, cam.h);
+    }
+    if (B && B.isActive && B.isActive() && B.draw) B.draw(ctx, cam.w, cam.h);
     Input.endFrame();
     requestAnimationFrame(frame);
   }
