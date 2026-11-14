@@ -56,14 +56,14 @@ window.Game = window.Game || {};
     '.t.......o................t............F',
     '.T......o...................s..........F',
     '.........o.......................T.....F',
-    '.T..FFFFo.FFFF.................T...t...F',
-    '....F....o...F......s..................F',
-    '.T..F.cco..ccF................t...T....F',
-    '....F........F..................T......F',
-    '.T..F.cc..cc.F..........s..............F',
-    '....F...c...cF....s....................F',
-    '.T..F.c...c..F.........................F',
-    '....FFFFFFFFFF........s.............s..F',
+    '.T..FFFFo.FFFF..FFFFF..FFFFF...T...t...F',
+    '....F....o...F..F...s......F...........F',
+    '.T..F.cco..ccF..F..........F..t...T....F',
+    '....F........F..F..........F....T......F',
+    '.T..F.cc..cc.F..F.......s..F...........F',
+    '....F...c...cF..F.s........F...........F',
+    '.T..F.c...c..F..F..........F...........F',
+    '....FFFFFFFFFF..FFFFFFFFFFFF........s..F',
     '.T.....................................F',
     '.t..............t...........T....T.....F',
     '.T..................t..................F',
@@ -86,6 +86,9 @@ window.Game = window.Game || {};
     pathStones: [],   // flat decoration drawn on the ground
     chest: null
   };
+
+  // Animal pen area (must match the fence in OBJECTS: cols 16-27, rows 13-20, inside edges).
+  W.pen = { x: 17 * TILE, y: 14 * TILE, w: 10 * TILE, h: 6 * TILE };
 
   function hash(c, r) {
     return (((c * 73856093) ^ (r * 19349663)) >>> 0);
@@ -170,10 +173,8 @@ window.Game = window.Game || {};
         } else if (ch === 'o') {
           W.pathStones.push({ rect: S.stones[hash(c, r) % S.stones.length], x: x + 1 + (hash(r, c) % 3), y: y + 1 + (hash(c + 5, r) % 3) });
         } else if (ch === 's') {
-          (function (c, r, x, y) {
-            var rect = S.stones[hash(c, r) % S.stones.length];
-            addDrawable(y + 14, function (ctx, cam) { spr(ctx, rect, x + 1, y + 1, cam); });
-          })(c, r, x, y);
+          // loose stones also lie flat, so the player always walks in front of them
+          W.pathStones.push({ rect: S.stones[hash(c, r) % S.stones.length], x: x + 1, y: y + 1 });
         } else if (ch === 'c') {
           (function (c, r, x, y) {
             var rect = S.crop(hash(c, r) >> 3, (c * 7 + r * 3) % 6);
@@ -184,9 +185,10 @@ window.Game = window.Game || {};
         }
       }
     }
+    if (Game.Animals) Game.Animals.init(W.pen);
   };
 
-  W.update = function (dt) { /* nothing moves yet */ };
+  W.update = function (dt, player) { if (Game.Animals) Game.Animals.update(dt, player); };
 
   W.drawGround = function (ctx, cam) {
     var A = Game.Assets, S = Game.Sprites;
@@ -219,7 +221,9 @@ window.Game = window.Game || {};
     }
   };
 
-  W.getDrawables = function () { return W.drawables; };
+  W.getDrawables = function () {
+    return Game.Animals ? W.drawables.concat(Game.Animals.getDrawables()) : W.drawables;
+  };
 
   W.isSolidRect = function (x, y, w, h) {
     if (x < 0 || y < 0 || x + w > W.widthPx || y + h > W.heightPx) return true;
@@ -228,10 +232,13 @@ window.Game = window.Game || {};
       var s = list[i];
       if (x < s.x + s.w && x + w > s.x && y < s.y + s.h && y + h > s.y) return true;
     }
+    if (Game.Animals && Game.Animals.blocksRect(x, y, w, h)) return true;
     return false;
   };
 
-  W.getSolidRects = function () { return W.solids; };
+  W.getSolidRects = function () {
+    return Game.Animals ? W.solids.concat(Game.Animals.getRects()) : W.solids;
+  };
 
   // Look ~12px in front of the feet for something the player can use.
   W.getInteractableAt = function (x, y, facing) {

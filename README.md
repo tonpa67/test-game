@@ -25,4 +25,4 @@ Tip: stand right next to the chest, face it, then press E.
 
 - You can't leave the farm: trees and fences surround it.
 - You can walk behind treetops and the cottage roof.
-- There is no sound and no animals yet. They may come later.
+- There is an animal pen east of the farm. Enter it by the gate at the top. There is no sound yet.

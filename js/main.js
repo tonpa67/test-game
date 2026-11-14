@@ -54,7 +54,7 @@ window.Game = window.Game || {};
     if (Input.wasPressed('debug')) C.DEBUG = !C.DEBUG;
 
     player.update(dt, Input, World);
-    World.update(dt);
+    World.update(dt, player);
     cam.follow(player.x, player.y - 8, World.widthPx, World.heightPx);
 
     ctx.imageSmoothingEnabled = false;

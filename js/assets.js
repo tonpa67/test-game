@@ -12,7 +12,12 @@ window.Game = window.Game || {};
     road:     ROOT + 'Objects/Road copiar.png',
     chest:    ROOT + 'Objects/chest.png',
     crops:    ROOT + 'Objects/Spring Crops.png',
-    interior: ROOT + 'Objects/Interior.png'
+    interior: ROOT + 'Objects/Interior.png',
+    cowF:     ROOT + 'Farm Animals/Female Cow Brown.png',
+    cowM:     ROOT + 'Farm Animals/Male Cow Brown.png',
+    chickenRed:    ROOT + 'Farm Animals/Chicken Red.png',
+    chickenBlonde: ROOT + 'Farm Animals/Chicken Blonde  Green.png',
+    chick:    ROOT + 'Farm Animals/Baby Chicken Yellow.png'
   };
   var images = {};
 

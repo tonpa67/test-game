@@ -54,6 +54,13 @@ window.Game = window.Game || {};
     return { img: 'crops', x: col * 16, y: row * 16, w: 16, h: 16 };
   };
 
+  // Farm animals: frames are laid out in rows; foot point is where the animal touches the ground.
+  S.animals = {
+    cow: { w: 32, h: 32, footX: 16, footY: 31, frames: 4, row: { left: 0, right: 0, down: 1, up: 2 }, flipRight: true },
+    chicken: { w: 16, h: 16, footX: 8, footY: 15, frames: 4, row: { left: 0, right: 1 }, flipRight: false },
+    chick: { w: 16, h: 16, footX: 8, footY: 15, frames: 4, row: { left: 0, right: 1 }, flipRight: false }
+  };
+
   // Draw a rectangle from the atlas at world position (dx,dy) minus camera.
   S.draw = function (ctx, r, dx, dy, cam) {
     var img = Game.Assets.get(r.img);

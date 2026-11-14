@@ -81,7 +81,7 @@
         var frame = Math.floor(self.animTime) % n;
         var row = ROW[self.facing];
         G.drawSprite(ctx, img, frame * FRAME, row * FRAME, FRAME, FRAME,
-          self.x - FEET_X - cam.x, self.y - FEET_Y - cam.y, self.facing === 'right');
+          self.x - FEET_X - cam.x, self.y - FEET_Y - cam.y, self.facing === 'left');
       }
     };
   };
