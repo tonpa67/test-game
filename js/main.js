@@ -39,10 +39,12 @@ window.Game = window.Game || {};
     scale = Math.max(1, Math.floor(Math.min(iw / C.BASE_VIEW_W, ih / C.BASE_VIEW_H)));
     var vw = Math.max(1, Math.floor(iw / scale));
     var vh = Math.max(1, Math.floor(ih / scale));
-    canvas.width = vw; canvas.height = vh;
+    // Full-resolution canvas: every game pixel is drawn scale x scale real pixels, so text stays sharp.
+    canvas.width = vw * scale; canvas.height = vh * scale;
     canvas.style.width = (vw * scale) + 'px';
     canvas.style.height = (vh * scale) + 'px';
     cam.w = vw; cam.h = vh;
+    Game.view = { w: vw, h: vh, scale: scale };
     ctx.imageSmoothingEnabled = false;
   }
 
@@ -74,9 +76,11 @@ window.Game = window.Game || {};
     }
     cam.follow(player.x, player.y - 8, World.widthPx, World.heightPx);
 
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
     ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = 1;
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, cam.w, cam.h);
     World.drawGround(ctx, cam);
 
     var list = World.getDrawables().slice();

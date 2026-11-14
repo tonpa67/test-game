@@ -71,15 +71,16 @@ window.Game = window.Game || {};
     if (!canvas) canvas = document.getElementById('game');
     return canvas;
   }
-  // Turns a screen position into game-pixel position on the canvas.
+  // Turns a screen position into game-pixel (logical view) position.
   function toCanvas(cx, cy) {
     var c = getCanvas();
     if (!c) return { x: 0, y: 0, inside: false };
     var r = c.getBoundingClientRect();
     if (!r.width || !r.height) return { x: 0, y: 0, inside: false };
-    var x = Math.floor((cx - r.left) * c.width / r.width);
-    var y = Math.floor((cy - r.top) * c.height / r.height);
-    return { x: x, y: y, inside: x >= 0 && y >= 0 && x < c.width && y < c.height };
+    var vw = (Game.Camera && Game.Camera.w) || c.width, vh = (Game.Camera && Game.Camera.h) || c.height;
+    var x = Math.floor((cx - r.left) * vw / r.width);
+    var y = Math.floor((cy - r.top) * vh / r.height);
+    return { x: x, y: y, inside: x >= 0 && y >= 0 && x < vw && y < vh };
   }
 
   window.addEventListener('mousemove', function (e) {

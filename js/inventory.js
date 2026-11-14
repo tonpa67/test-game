@@ -365,29 +365,21 @@ window.Game = window.Game || {};
   }
 
   // ---- Drawing ----
-  var DIGITS = {
-    '0': '111101101101111', '1': '010110010010111', '2': '111001111100111', '3': '111001111001111',
-    '4': '101101111001001', '5': '111100111001111', '6': '111100111101111', '7': '111001001001001',
-    '8': '111101111101111', '9': '111101111001111'
-  };
-  function textWidth(str) { return str.length * 4 - 1; }
-  function drawDigits(ctx, str, x, y, color) {
+  // Numbers (slot numbers and stack counts) are drawn as normal text so they stay sharp and readable.
+  function drawDigits(ctx, str, x, y, color, align) {
+    ctx.font = Game.CONFIG.UI.font(8);
+    ctx.textBaseline = 'top';
+    ctx.textAlign = align || 'left';
     ctx.fillStyle = color;
-    for (var c = 0; c < str.length; c++) {
-      var g = DIGITS[str.charAt(c)];
-      if (!g) continue;
-      for (var p = 0; p < 15; p++) {
-        if (g.charAt(p) === '1') ctx.fillRect(x + c * 4 + (p % 3), y + Math.floor(p / 3), 1, 1);
-      }
-    }
+    ctx.fillText(str, x, y);
+    ctx.textAlign = 'left';
   }
   function drawCount(ctx, n, right, bottom) {
-    var str = String(n), x = right - textWidth(str) + 1, y = bottom - 4;
-    var o = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    for (var k = 0; k < o.length; k++) drawDigits(ctx, str, x + o[k][0], y + o[k][1], COL.OUTLINE);
-    drawDigits(ctx, str, x, y, COL.TEXT_LIGHT);
+    var str = String(n), x = right + 1, y = bottom - 7;
+    var o = [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+    for (var k = 0; k < o.length; k++) drawDigits(ctx, str, x + o[k][0], y + o[k][1], COL.OUTLINE, 'right');
+    drawDigits(ctx, str, x, y, COL.TEXT_LIGHT, 'right');
   }
-
   function drawFrame(ctx, x, y, w, h) {
     ctx.fillStyle = COL.OUTLINE; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = COL.WOOD; ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
@@ -409,8 +401,8 @@ window.Game = window.Game || {};
     ctx.fillRect(x + 1, y + 1, SLOT - 2, 1);
     ctx.fillRect(x + 1, y + 2, 1, SLOT - 3);
     if (number) {
-      ctx.globalAlpha = 0.45;
-      drawDigits(ctx, String(number), x + 3, y + 3, COL.WOOD_DARK);
+      ctx.globalAlpha = 0.7;
+      drawDigits(ctx, String(number), x + 3, y + 2, COL.WOOD_DARK);
       ctx.globalAlpha = 1;
     }
     var a = arr(entry.area);
@@ -424,7 +416,7 @@ window.Game = window.Game || {};
   function drawPanel(ctx, p) {
     var f = p.frame;
     drawFrame(ctx, f.x, f.y, f.w, f.h);
-    ctx.font = '8px monospace';
+    ctx.font = Game.CONFIG.UI.font(8);
     ctx.textBaseline = 'top';
     ctx.textAlign = 'center';
     ctx.fillStyle = COL.OUTLINE;

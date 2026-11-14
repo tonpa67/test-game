@@ -27,7 +27,7 @@ window.Game = window.Game || {};
     },
     text: function (c, s, x, y, color, o) {
       o = o || {};
-      c.font = '8px monospace'; c.textBaseline = 'top';
+      c.font = Game.CONFIG.UI.font(8); c.textBaseline = 'top';
       c.textAlign = o.align || 'left';
       x = Math.round(x); y = Math.round(y);
       if (o.shadow) { c.fillStyle = FBCOL.OUTLINE; c.fillText(s, x + 1, y + 1); }
@@ -35,7 +35,7 @@ window.Game = window.Game || {};
       c.textAlign = 'left';
     },
     wrap: function (c, s, maxW) {
-      c.font = '8px monospace';
+      c.font = Game.CONFIG.UI.font(8);
       var words = String(s).split(' '), lines = [], cur = '';
       for (var i = 0; i < words.length; i++) {
         var t = cur ? cur + ' ' + words[i] : words[i];
@@ -666,7 +666,7 @@ window.Game = window.Game || {};
     lastL = L;
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.font = '8px monospace'; ctx.textBaseline = 'top';
+    ctx.font = Game.CONFIG.UI.font(8); ctx.textBaseline = 'top';
 
     if (phase === 'transIn') {
       if (F) F.drawTransIn(ctx, viewW, viewH, tin, pt);

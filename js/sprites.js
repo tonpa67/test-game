@@ -73,6 +73,7 @@ window.Game = window.Game || {};
   // (the words above each group of poses are above that line). Feet at (16,47) in a cell.
   S.rival = {
     cw: 32, ch: 48, top: 32, footX: 16, footY: 47,
+    drawScale: 0.75,         // Rex is drawn at this size (1 = full size); change it here
     groupX: { attack: 32, run: 176, wave: 320 },
     row: { down: 0, side: 1, up: 2 },
     sideFacesRight: false,   // checked by eye: the side poses look to the LEFT

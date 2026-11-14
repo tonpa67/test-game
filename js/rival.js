@@ -76,7 +76,7 @@ window.Game = window.Game || {};
       introLines: [NAME + ' wants to battle!', 'Rex sent out ' + foeName + '!', 'Go, ' + leadName() + '!'],
       winLines: ['Rex: Wow, you beat me! That was fun!', 'Rex: Come back for a rematch any time!'],
       loseLines: ['Rex: Yes, I won this time!', 'Rex: Rest up and try again, friend!'],
-      from: { x: Math.round(rex.x - cam.x), y: Math.round(rex.y - 24 - cam.y) },
+      from: { x: Math.round(rex.x - cam.x), y: Math.round(rex.y - 24 * (Game.Sprites.rival.drawScale || 1) - cam.y) },
       onBlack: function (result) {
         if (result && result.outcome === 'lose') {
           if (T.healAll) T.healAll();
@@ -127,6 +127,24 @@ window.Game = window.Game || {};
     ctx.fillRect(x + 2, y + 4, 2, 2); ctx.fillRect(x + 5, y + 4, 2, 2); ctx.fillRect(x + 8, y + 4, 1, 2);
   }
 
+  // Each frame is copied (flipped if needed) into its own small picture with 1px of empty padding,
+  // so smooth shrinking never blends in the neighbouring frames of the sheet.
+  var FRAME_PAD = 1, picCache = {};
+  function framePic(sx, sy, flip) {
+    var S = Game.Sprites.rival;
+    var key = sx + ',' + sy + ',' + (flip ? 1 : 0);
+    var c = picCache[key];
+    if (c) return c;
+    c = document.createElement('canvas');
+    c.width = S.cw + FRAME_PAD * 2; c.height = S.ch + FRAME_PAD * 2;
+    var g = c.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    if (flip) { g.translate(c.width, 0); g.scale(-1, 1); }
+    g.drawImage(rex.sheet, sx, sy, S.cw, S.ch, FRAME_PAD, FRAME_PAD, S.cw, S.ch);
+    picCache[key] = c;
+    return c;
+  }
+
   function drawRex(ctx, cam) {
     var S = Game.Sprites.rival;
     if (!rex || !rex.sheet) return;
@@ -141,19 +159,20 @@ window.Game = window.Game || {};
     if (rex.wave > 0) { group = S.groupX.wave; frame = Math.floor(rex.waveT * 6) % 4; }
     else bob = Math.floor(rex.clock / 0.5) % 2;
     var sx = group + frame * S.cw, sy = S.top + row * S.ch;
-    var dx = Math.round(rex.x - S.footX - cam.x), dy = Math.round(rex.y - S.footY - cam.y - bob);
-    if (flip) {
-      ctx.save();
-      ctx.translate(dx + S.cw, dy);
-      ctx.scale(-1, 1);
-      ctx.drawImage(rex.sheet, sx, sy, S.cw, S.ch, 0, 0, S.cw, S.ch);
-      ctx.restore();
-    } else {
-      ctx.drawImage(rex.sheet, sx, sy, S.cw, S.ch, dx, dy, S.cw, S.ch);
-    }
-    if (rex.near && !(Game.Dialog && Game.Dialog.isOpen && Game.Dialog.isOpen())) {
+    var k = S.drawScale || 1;
+    var pic = framePic(sx, sy, flip);
+    var P = FRAME_PAD;
+    // pic has P transparent pixels around the cell; the feet sit at (footX, footY) of the cell
+    var fx = flip ? S.cw - S.footX : S.footX;
+    var dx = Math.round(rex.x - (fx + P) * k - cam.x), dy = Math.round(rex.y - (S.footY + P) * k - cam.y - bob);
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(pic, 0, 0, pic.width, pic.height, dx, dy, pic.width * k, pic.height * k);
+    ctx.restore();
+    ctx.imageSmoothingEnabled = false;    if (rex.near && !(Game.Dialog && Game.Dialog.isOpen && Game.Dialog.isOpen())) {
       var b = Math.floor(rex.clock / 0.5) % 2;
-      drawBubble(ctx, Math.round(rex.x - 5 - cam.x), Math.round(rex.y - 46 - cam.y) + b);
+      drawBubble(ctx, Math.round(rex.x - 5 - cam.x), Math.round(rex.y - 14 - 32 * (S.drawScale || 1) - cam.y) + b);
     }
   }
 
@@ -168,7 +187,7 @@ window.Game = window.Game || {};
     },
     // Solid box at his feet (the world adds it to what blocks the player).
     getSolid: function () {
-      return rex ? { x: rex.x - 6, y: rex.y - 6, w: 12, h: 6 } : null;
+      return rex ? { x: rex.x - 5, y: rex.y - 6, w: 10, h: 6 } : null;
     },
     update: function (dt, player) {
       if (!rex) return;
@@ -192,7 +211,7 @@ window.Game = window.Game || {};
       if (facing === 'left') dx = -1; else if (facing === 'right') dx = 1;
       else if (facing === 'up') dy = -1; else dy = 1;
       var px = x + dx * 12, py = y + dy * 12 - (dx !== 0 ? 4 : 0);
-      var r = { x: rex.x - 8, y: rex.y - 10, w: 16, h: 12 };
+      var r = { x: rex.x - 7, y: rex.y - 9, w: 14, h: 11 };
       if (px >= r.x - 2 && px <= r.x + r.w + 2 && py >= r.y - 2 && py <= r.y + r.h + 2) {
         return { interact: talk };
       }

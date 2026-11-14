@@ -367,7 +367,7 @@
   // ---- SOUND_FILES: which sound slot uses which file. Slots without a file use the built-in synth sound. ----
   G.Audio.registerFile('pickup', 'Audio/floraphonic-bloop-2-186531.mp3');
   // First 5 seconds of this song play when a battle starts (file is not on GitHub; synth whoosh if missing).
-  G.Audio.registerFile('battleStart', 'Audio/Pokémon FireRed & LeafGreen - Rival Encounter Music (HQ).mp3', { gain: 1.2 });
+  G.Audio.registerFile('battleStart', 'Audio/Pokémon FireRed & LeafGreen - Rival Encounter Music (HQ).mp3', { gain: 0.6 });
   // Ready for your own files (uncomment and point at a file):
   // G.Audio.registerFile('talk', 'Audio/talk.mp3');
   // G.Audio.registerFile('menuMove', 'Audio/menu-move.mp3');

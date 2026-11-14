@@ -180,7 +180,7 @@ window.Game = window.Game || {};
       }
 
       ctx.save();
-      ctx.font = '8px monospace';
+      ctx.font = Game.CONFIG.UI.font(8);
       ctx.textBaseline = 'top';
       ctx.textAlign = 'left';
       ctx.imageSmoothingEnabled = false;

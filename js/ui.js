@@ -8,7 +8,7 @@ window.Game = window.Game || {};
     CREAM: C.CREAM || '#D9AB91', CREAM_LIGHT: C.CREAM_LIGHT || '#EBCFB4', SLOT_BG: C.SLOT_BG || '#C39478',
     SELECT: C.SELECT || '#FFE6A0', TEXT_DARK: C.TEXT_DARK || '#32131E', TEXT_LIGHT: C.TEXT_LIGHT || '#FFF4E0'
   };
-  var FONT = '8px monospace';
+  var FONT = Game.CONFIG.UI.font(8);
 
   function frame(ctx, x, y, w, h) {
     ctx.fillStyle = COL.OUTLINE; ctx.fillRect(x, y, w, h);
@@ -84,6 +84,6 @@ window.Game = window.Game || {};
     ctx.fillRect(x + 2, y + 2, 1, 1);
   }
 
-  Game.UI = { COL: COL, frame: frame, panel: panel, text: text, wrap: wrap, bar: bar,
+  Game.UI = { COL: COL, font: Game.CONFIG.UI.font, FONT: FONT, frame: frame, panel: panel, text: text, wrap: wrap, bar: bar,
     hpColor: hpColor, cursor: cursor, moreArrow: moreArrow };
 })();

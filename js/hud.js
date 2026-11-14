@@ -39,7 +39,7 @@
     var L = inv.getLayout(viewW, viewH).hotbar.frame;
     var U = (G.CONFIG && G.CONFIG.UI) || {};
     var str = String(Math.floor(coins));
-    ctx.font = '8px monospace';
+    ctx.font = Game.CONFIG.UI.font(8);
     var tw = Math.ceil(ctx.measureText(str).width);
     var w = Math.max(34, tw + 18), h = 12;
     var x = L.x + L.w + 4, y = L.y + 7;
@@ -77,7 +77,7 @@
       var c = ui();
 
       ctx.save();
-      ctx.font = '8px monospace';
+      ctx.font = Game.CONFIG.UI.font(8);
       ctx.textBaseline = 'top';
       ctx.textAlign = 'left';
 
