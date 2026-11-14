@@ -53,8 +53,13 @@ window.Game = window.Game || {};
 
     if (Input.wasPressed('debug')) C.DEBUG = !C.DEBUG;
 
-    player.update(dt, Input, World);
-    World.update(dt, player);
+    var Inv = Game.Inventory;
+    if (Inv) Inv.handleInput(Input);
+    var paused = !!(Inv && Inv.isOpen());
+    if (!paused) {
+      player.update(dt, Input, World);
+      World.update(dt, player);
+    }
     cam.follow(player.x, player.y - 8, World.widthPx, World.heightPx);
 
     ctx.imageSmoothingEnabled = false;
@@ -82,6 +87,7 @@ window.Game = window.Game || {};
     }
 
     if (Game.HUD) Game.HUD.draw(ctx, cam.w, cam.h, dt);
+    if (Inv) Inv.draw(ctx, cam.w, cam.h);
     Input.endFrame();
     requestAnimationFrame(frame);
   }

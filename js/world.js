@@ -186,9 +186,24 @@ window.Game = window.Game || {};
       }
     }
     if (Game.Animals) Game.Animals.init(W.pen);
+    if (Game.Eggs) Game.Eggs.init(W.pen);
   };
 
-  W.update = function (dt, player) { if (Game.Animals) Game.Animals.update(dt, player); };
+  W.update = function (dt, player) {
+    if (Game.Animals) Game.Animals.update(dt, player);
+    if (Game.Eggs) Game.Eggs.update(dt, player);
+  };
+
+  // Like isSolidRect but only looks at fixed things (trees, fences, house...), not animals.
+  W.isStaticSolidRect = function (x, y, w, h) {
+    if (x < 0 || y < 0 || x + w > W.widthPx || y + h > W.heightPx) return true;
+    var list = W.solids;
+    for (var i = 0; i < list.length; i++) {
+      var s = list[i];
+      if (x < s.x + s.w && x + w > s.x && y < s.y + s.h && y + h > s.y) return true;
+    }
+    return false;
+  };
 
   W.drawGround = function (ctx, cam) {
     var A = Game.Assets, S = Game.Sprites;
@@ -222,7 +237,10 @@ window.Game = window.Game || {};
   };
 
   W.getDrawables = function () {
-    return Game.Animals ? W.drawables.concat(Game.Animals.getDrawables()) : W.drawables;
+    var out = W.drawables;
+    if (Game.Animals) out = out.concat(Game.Animals.getDrawables());
+    if (Game.Eggs) out = out.concat(Game.Eggs.getDrawables());
+    return out;
   };
 
   W.isSolidRect = function (x, y, w, h) {
@@ -252,6 +270,7 @@ window.Game = window.Game || {};
       var r = ch.rect;
       if (px >= r.x - 2 && px <= r.x + r.w + 2 && py >= r.y - 2 && py <= r.y + r.h + 2) return ch;
     }
+    if (Game.Eggs && Game.Eggs.getNearest) return Game.Eggs.getNearest(x, y - 3, 16);
     return null;
   };
 

@@ -7,10 +7,17 @@ window.Game = window.Game || {};
     KeyD: 'right', ArrowRight: 'right',
     ShiftLeft: 'slow', ShiftRight: 'slow',
     KeyE: 'interact', Space: 'interact',
+    KeyI: 'inventory', Escape: 'close',
     F3: 'debug'
   };
+  for (var n = 1; n <= 5; n++) {
+    MAP['Digit' + n] = 'slot' + n;
+    MAP['Numpad' + n] = 'slot' + n;
+  }
   var down = {};
   var pressed = {};
+  var wheelAcc = 0;   // raw wheel distance not yet turned into a step
+  var steps = 0;      // whole slot steps this frame
 
   window.addEventListener('keydown', function (e) {
     var a = MAP[e.code];
@@ -25,7 +32,19 @@ window.Game = window.Game || {};
     e.preventDefault();
     delete down[e.code];
   });
-  window.addEventListener('blur', function () { down = {}; pressed = {}; });
+  window.addEventListener('blur', function () { down = {}; pressed = {}; wheelAcc = 0; steps = 0; });
+
+  window.addEventListener('wheel', function (e) {
+    if (!e.ctrlKey) e.preventDefault();
+    var d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= 100;
+    if (!d) return;
+    if ((d > 0) !== (wheelAcc > 0) && wheelAcc !== 0) wheelAcc = 0;
+    wheelAcc += d;
+    while (Math.abs(wheelAcc) >= 40) {
+      if (wheelAcc > 0) { steps++; wheelAcc -= 40; } else { steps--; wheelAcc += 40; }
+    }
+  }, { passive: false });
 
   Game.Input = {
     isDown: function (action) {
@@ -33,6 +52,7 @@ window.Game = window.Game || {};
       return false;
     },
     wasPressed: function (action) { return !!pressed[action]; },
-    endFrame: function () { pressed = {}; }
+    wheelSteps: function () { return steps; },
+    endFrame: function () { pressed = {}; steps = 0; }
   };
 })();

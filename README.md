@@ -16,7 +16,10 @@ No installing, no internet and no extra programs needed. Just keep the `Assets` 
 | --- | --- |
 | W A S D or the arrow keys | Move around (you run by default) |
 | Hold Shift | Walk slowly instead of running |
-| E or Space | Use something in front of you (for example, open or close the chest) |
+| E or Space | Open or close the chest, pick up an egg |
+| I | Open or close your backpack (the game pauses while it is open) |
+| Esc | Close the backpack |
+| 1-5 or mouse wheel | Choose a hotbar slot (the row of five slots at the bottom) |
 | F3 | Show or hide a debug view with red boxes (only useful for fixing problems) |
 
 Tip: stand right next to the chest, face it, then press E.
@@ -25,4 +28,8 @@ Tip: stand right next to the chest, face it, then press E.
 
 - You can't leave the farm: trees and fences surround it.
 - You can walk behind treetops and the cottage roof.
-- There is an animal pen east of the farm. Enter it by the gate at the top. There is no sound yet.
+- There is an animal pen east of the farm. Enter it by the gate at the top.
+- One red chicken in the pen lays an egg about every minute. There can be at most 5 eggs lying on the ground at a time.
+- Walk up to an egg and press E to pick it up. You hear a small pop sound. The sound starts after your first key press or click (that is a browser rule).
+- Eggs go into the hotbar first, then into the backpack. One slot holds up to 99 of the same thing.
+- Your backpack and eggs are not saved: they reset when you reload the page.

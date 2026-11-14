@@ -145,6 +145,16 @@ window.Game = window.Game || {};
       area = { x: pen.x + 4, y: pen.y + 4, w: pen.w - 8, h: pen.h - 8 };
       lastPlayerBox = null;
       list = START.map(makeAnimal);
+      // the first red chicken is the one that lays the eggs
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].img === 'chickenRed') { list[i].layer = true; break; }
+      }
+    },
+    getLayer: function () {
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].layer) return { x: list[i].x, y: list[i].y, side: list[i].side };
+      }
+      return null;
     },
     update: function (dt, player) {
       if (!area) return;

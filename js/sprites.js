@@ -61,6 +61,10 @@ window.Game = window.Game || {};
     chick: { w: 16, h: 16, footX: 8, footY: 15, frames: 4, row: { left: 0, right: 1 }, flipRight: false }
   };
 
+  // Egg (row 3 of Baby Chicken Yellow.png). Frame 1 is slightly squashed = a little wobble.
+  S.egg = { img: 'chick', x: 0, y: 32, w: 16, h: 16, footX: 8, footY: 15 };
+  S.eggWobble = { img: 'chick', x: 16, y: 32, w: 16, h: 16 };
+
   // Draw a rectangle from the atlas at world position (dx,dy) minus camera.
   S.draw = function (ctx, r, dx, dy, cam) {
     var img = Game.Assets.get(r.img);
