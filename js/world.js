@@ -188,6 +188,7 @@ window.Game = window.Game || {};
         }
       }
     }
+    if (Game.Effects) Game.Effects.clear();
     if (Game.Animals) Game.Animals.init(W.pen);
     if (Game.Eggs) Game.Eggs.init(W.pen);
   };
@@ -195,6 +196,7 @@ window.Game = window.Game || {};
   W.update = function (dt, player) {
     if (Game.Animals) Game.Animals.update(dt, player);
     if (Game.Eggs) Game.Eggs.update(dt, player);
+    if (Game.Effects) Game.Effects.update(dt);
   };
 
   // Like isSolidRect but only looks at fixed things (trees, fences, house...), not animals.
@@ -243,6 +245,7 @@ window.Game = window.Game || {};
     var out = W.drawables;
     if (Game.Animals) out = out.concat(Game.Animals.getDrawables());
     if (Game.Eggs) out = out.concat(Game.Eggs.getDrawables());
+    if (Game.Effects) out = out.concat(Game.Effects.getDrawables());
     return out;
   };
 

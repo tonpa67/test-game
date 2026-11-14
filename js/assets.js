@@ -17,7 +17,8 @@ window.Game = window.Game || {};
     cowM:     ROOT + 'Farm Animals/Male Cow Brown.png',
     chickenRed:    ROOT + 'Farm Animals/Chicken Red.png',
     chickenBlonde: ROOT + 'Farm Animals/Chicken Blonde  Green.png',
-    chick:    ROOT + 'Farm Animals/Baby Chicken Yellow.png'
+    chick:    ROOT + 'Farm Animals/Baby Chicken Yellow.png',
+    smoke3:   'Assets/Smoke Effect 01/Smoke VFX3.png'
   };
   var images = {};
 

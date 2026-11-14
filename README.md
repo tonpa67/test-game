@@ -30,8 +30,8 @@ Tip: stand right next to the chest, face it, then press E.
 - You can't leave the farm: trees and fences surround it.
 - You can walk behind treetops and the cottage roof.
 - There is an animal pen east of the farm. Enter it by the gate at the top.
-- One red chicken in the pen lays an egg about every minute. There can be at most 5 eggs lying on the ground at a time.
-- Walk up to an egg and press E to pick it up. You hear a small pop sound. The sound starts after your first key press or click (that is a browser rule).
+- One red chicken in the pen lays its first egg right away, then about one every 30 seconds. There can be at most 5 eggs lying on the ground at a time.
+- Walk up to an egg and press E to pick it up. A small puff of smoke appears when you pick up an egg. You hear a small pop sound. The sound starts after your first key press or click (that is a browser rule).
 - Eggs go into the hotbar first, then into the backpack. One slot holds up to 99 of the same thing.
 - With the backpack or chest open, click an item to pick it up, then click a slot to put it down. The same item stacks up to 99; a different item swaps places.
 - Shift+click sends a whole stack across: backpack to chest and back, or hotbar to backpack when no chest is open.

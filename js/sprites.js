@@ -65,6 +65,10 @@ window.Game = window.Game || {};
   S.egg = { img: 'chick', x: 0, y: 32, w: 16, h: 16, footX: 8, footY: 15 };
   S.eggWobble = { img: 'chick', x: 16, y: 32, w: 16, h: 16 };
 
+  // Smoke puff (Smoke VFX3.png): 7 frames of 32x16, drawn 1:1.
+  S.smoke3 = { img: 'smoke3', w: 32, h: 16, frames: 7, footX: 16, footY: 15 };
+  S.smokeFrame = function (i) { return { img: 'smoke3', x: i * 32, y: 0, w: 32, h: 16 }; };
+
   // Draw a rectangle from the atlas at world position (dx,dy) minus camera.
   S.draw = function (ctx, r, dx, dy, cam) {
     var img = Game.Assets.get(r.img);

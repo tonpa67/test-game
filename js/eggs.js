@@ -3,7 +3,7 @@ window.Game = window.Game || {};
 (function () {
   'use strict';
 
-  var LAY_INTERVAL = 60;   // seconds between eggs
+  var LAY_INTERVAL = 30;   // seconds between eggs
   var MAX_EGGS = 5;        // most eggs lying on the ground at once
   var RETRY = 2;           // seconds to wait when no free spot was found
   var REACH = 16;          // how close the player must be to pick an egg up
@@ -11,7 +11,7 @@ window.Game = window.Game || {};
   var eggs = [];
   var pen = null;
   var area = null;         // where eggs may lie (pen shrunk by 4px)
-  var timer = LAY_INTERVAL;
+  var timer = 0;
   var clock = 0;           // game time that only runs while the game is not paused
   var lastPlayer = null;
   var nearest = null;
@@ -110,6 +110,7 @@ window.Game = window.Game || {};
   function pickUp(egg) {
     var left = Game.Inventory && Game.Inventory.add ? Game.Inventory.add('egg', 1) : 1;
     if (left === 0) {
+      if (Game.Effects && Game.Effects.spawn) Game.Effects.spawn('smoke', egg.x, egg.y);
       removeEgg(egg);
       if (Game.Audio && Game.Audio.play) Game.Audio.play('pickup');
     } else {
@@ -162,7 +163,7 @@ window.Game = window.Game || {};
       pen = p;
       area = { x: p.x + 4, y: p.y + 4, w: p.w - 8, h: p.h - 8 };
       eggs = [];
-      timer = LAY_INTERVAL;
+      timer = 0;
       clock = 0;
       nearest = null;
     },
