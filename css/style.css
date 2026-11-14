@@ -1,0 +1,27 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+#game {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #000;
+}
+#error {
+  display: none;
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  padding: 16px;
+  background: #7a1c1c;
+  color: #fff;
+  font: 16px/1.4 sans-serif;
+  z-index: 10;
+}
