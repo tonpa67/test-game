@@ -54,8 +54,9 @@ window.Game = window.Game || {};
     if (Input.wasPressed('debug')) C.DEBUG = !C.DEBUG;
 
     var Inv = Game.Inventory;
-    if (Inv) Inv.handleInput(Input);
-    var paused = !!(Inv && Inv.isOpen());
+    var wasOpen = !!(Inv && Inv.isOpen());
+    if (Inv) Inv.handleInput(Input, cam.w, cam.h);
+    var paused = wasOpen || !!(Inv && Inv.isOpen());
     if (!paused) {
       player.update(dt, Input, World);
       World.update(dt, player);

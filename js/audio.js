@@ -115,14 +115,120 @@
     tone(c, out, 'sine', 880, 880, t, 0.03, 0.15, 0.003);
   };
 
+  // Helper: short burst of filtered noise.
+  var noiseBufs = [];
+  var noiseCtxs = [];
+  function noiseBuffer(c) {
+    var idx = noiseCtxs.indexOf(c);
+    if (idx >= 0) return noiseBufs[idx];
+    var len = Math.floor(c.sampleRate * 0.5);
+    var buf = c.createBuffer(1, len, c.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    noiseCtxs.push(c);
+    noiseBufs.push(buf);
+    return buf;
+  }
+  function noise(c, out, t, dur, peak, filterType, freq) {
+    var s = c.createBufferSource();
+    s.buffer = noiseBuffer(c);
+    var f = c.createBiquadFilter();
+    f.type = filterType;
+    f.frequency.value = freq;
+    var g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    s.connect(f);
+    f.connect(g);
+    g.connect(out);
+    s.start(t);
+    s.stop(t + dur + 0.02);
+  }
+
+  registry.chestOpen = function (c, out, t) {
+    // Wooden creak: wobbly sawtooth through a bandpass.
+    var o = c.createOscillator();
+    var g = c.createGain();
+    var bp = c.createBiquadFilter();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(150, t);
+    o.frequency.linearRampToValueAtTime(230, t + 0.28);
+    bp.type = 'bandpass';
+    bp.frequency.value = 900;
+    bp.Q.value = 6;
+    var lfo = c.createOscillator();
+    var lg = c.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 18;
+    lg.gain.value = 25;
+    lfo.connect(lg);
+    lg.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.14, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.connect(bp);
+    bp.connect(g);
+    g.connect(out);
+    o.start(t);
+    lfo.start(t);
+    o.stop(t + 0.32);
+    lfo.stop(t + 0.32);
+    // Latch thunk at the end.
+    tone(c, out, 'sine', 140, 60, t + 0.3, 0.09, 0.45, 0.004);
+    noise(c, out, t + 0.3, 0.03, 0.2, 'lowpass', 1500);
+  };
+
+  registry.chestClose = function (c, out, t) {
+    tone(c, out, 'sine', 110, 50, t, 0.14, 0.5, 0.004);
+    noise(c, out, t, 0.06, 0.25, 'lowpass', 700);
+    tone(c, out, 'triangle', 380, 200, t, 0.02, 0.08, 0.002);
+  };
+
+  // ---- Sound files (played with plain audio elements; works from file://) ----
+  var files = {};
+
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+  function synth(name) {
+    try {
+      if (!ac || !unlocked || muted || !master) return;
+      var fn = registry[name];
+      if (!fn) return;
+      if (ac.state === 'suspended' && ac.resume) ac.resume();
+      fn(ac, master, ac.currentTime);
+    } catch (e) {}
+  }
+
   G.Audio = {
     play: function (name) {
       try {
-        if (!ac || !unlocked || muted || !master) return;
-        var fn = registry[name];
-        if (!fn) return;
-        if (ac.state === 'suspended' && ac.resume) ac.resume();
-        fn(ac, master, ac.currentTime);
+        if (muted) return;
+        var f = files[name];
+        if (f && f.state !== 'failed') {
+          try {
+            var a = f.el.cloneNode();
+            a.volume = clamp01(volume * f.gain);
+            a.currentTime = 0;
+            var p = a.play();
+            if (p && p.catch) p.catch(function () { synth(name); });
+          } catch (e) { synth(name); }
+          return;
+        }
+        synth(name);
+      } catch (e) {}
+    },
+    registerFile: function (name, path, opts) {
+      try {
+        var gain = opts && Number(opts.gain) > 0 ? Number(opts.gain) : 2;
+        var el = new Audio(encodeURI(path));
+        var entry = { el: el, state: 'loading', gain: gain };
+        el.preload = 'auto';
+        el.addEventListener('canplaythrough', function () { entry.state = 'ready'; });
+        el.addEventListener('loadeddata', function () { if (entry.state === 'loading') entry.state = 'ready'; });
+        el.addEventListener('error', function () { entry.state = 'failed'; });
+        files[name] = entry;
+        if (el.load) el.load();
       } catch (e) {}
     },
     define: function (name, fn) {
@@ -139,4 +245,6 @@
       applyVolume();
     }
   };
+
+  G.Audio.registerFile('pickup', 'Audio/floraphonic-bloop-2-186531.mp3');
 })();

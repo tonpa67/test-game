@@ -154,7 +154,10 @@ window.Game = window.Game || {};
         } else if (ch === 'C') {
           (function (x, y) {
             var chest = { open: false, x: x, y: y };
-            chest.interact = function () { chest.open = !chest.open; };
+            chest.interact = function () {
+              if (Game.Inventory && Game.Inventory.openChest) Game.Inventory.openChest(chest);
+              else chest.open = !chest.open;
+            };
             chest.rect = { x: x + 1, y: y + 5, w: 14, h: 10 };
             W.chest = chest;
             addSolid(chest.rect.x, chest.rect.y, chest.rect.w, chest.rect.h);

@@ -6,7 +6,7 @@
   var FADE_TIME = 1.5; // seconds to fade out
   var LINES = [
     'WASD move, Shift walk slowly, E use',
-    'I backpack, 1-5 or scroll: hotbar'
+    'I backpack, 1-5/scroll/click: hotbar'
   ];
   var elapsed = 0;
   var message = null; // {text, left, total}
